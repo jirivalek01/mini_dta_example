@@ -1,6 +1,6 @@
 import pandas as pd
 
-df_products = pd.read_csv("/CEN0203F.csv")
+df_products = pd.read_csv("CEN0203F.csv")
 
 df_products.head()
 
