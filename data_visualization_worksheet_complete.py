@@ -1,34 +1,19 @@
+import streamlit as st
 import pandas as pd
-
-df_products = pd.read_csv("CEN0203F.csv")
-
-df_products.head()
-
-df_products['Ukazatel'].unique()
-
-df_products['IndicatorType'].unique()
-
-df_products['Reprezentant'].unique()
-
-import pandas as pd
-df_products = pd.read_csv("/CEN0203F.csv")
-df_products_subset = df_products[['Ukazatel','Reprezentant','CasM','Hodnota']].copy()
-
-df_products_subset.info()
-
-df_products_subset.describe()
-
-df_psenice = df_products_subset[df_products_subset['Reprezentant']=='Pšenice potravinářská [t]']
-
-df_psenice.head()
-
 import plotly.express as px
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent
+DATA_PATH = BASE_DIR / "CEN0203F.csv"
+
+df = pd.read_csv(DATA_PATH)
+
+df = df[['Ukazatel', 'Reprezentant', 'CasM', 'Hodnota']].copy()
+df['CasM'] = pd.to_datetime(df['CasM'], errors='coerce')
+df = df.sort_values('CasM')
+
+df_psenice = df[df['Reprezentant'].str.contains("Pšenice", na=False)]
 
 fig = px.line(df_psenice, x='CasM', y='Hodnota', color='Ukazatel')
 
-fig.show()
-
-df_products_subset_mean = df_products_subset[df_products_subset['Ukazatel']=='Průměrná cena zemědělských výrobků (Kč)']
-
-fig_mean = px.line(df_products_subset_mean, x='CasM', y='Hodnota', color='Reprezentant')
-fig_mean.show()
+st.plotly_chart(fig, use_container_width=True)
