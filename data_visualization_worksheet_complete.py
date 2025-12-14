@@ -19,7 +19,6 @@ df_products_subset['CasM'] = pd.to_datetime(df_products_subset['CasM'], errors='
 # Streamlit titul
 st.title("Vizualizace dat zemědělských produktů")
 
-
 # Filtr pro průměrné ceny
 df_products_subset_mean = df_products_subset[df_products_subset['Ukazatel'].str.contains("Průměrná cena", na=False)]
 
