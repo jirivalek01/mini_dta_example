@@ -1,29 +1,37 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
 
-# Nastavení cesty k datům (CSV musí být ve stejné složce jako tento soubor)
+# Nastavení cesty k datům
 BASE_DIR = Path(__file__).parent
 DATA_PATH = BASE_DIR / "CEN0203F.csv"
 
 # Načtení dat
-df_products = pd.read_csv(DATA_PATH)
+df = pd.read_csv(DATA_PATH)
+df['CasM'] = pd.to_datetime(df['CasM'], errors='coerce')
 
-# Výběr relevantních sloupců a kopie
-df_products_subset = df_products[['Ukazatel', 'Reprezentant', 'CasM', 'Hodnota']].copy()
+st.title("🌾 Dashboard zemědělských produktů")
 
-# Převod sloupce CasM na datetime
-df_products_subset['CasM'] = pd.to_datetime(df_products_subset['CasM'], errors='coerce')
+# Sidebar pro výběr reprezentanta
+reprezentant_list = df['Reprezentant'].unique()
+selected_reprezentant = st.sidebar.selectbox("Vyber produkt", reprezentant_list)
 
-# Streamlit titul
-st.title("Vizualizace dat zemědělských produktů")
+# Sidebar pro výběr ukazatele
+ukazatel_list = df['Ukazatel'].unique()
+selected_ukazatel = st.sidebar.selectbox("Vyber ukazatel", ukazatel_list)
 
-# Filtr pro průměrné ceny
-df_products_subset_mean = df_products_subset[df_products_subset['Ukazatel'].str.contains("Průměrná cena", na=False)]
+# Filtrace dat
+df_filtered = df[(df['Reprezentant'] == selected_reprezentant) &
+                 (df['Ukazatel'] == selected_ukazatel)]
 
-# Graf pro průměrné ceny
-st.subheader("Průměrné ceny zemědělských výrobků")
-fig_mean = px.line(df_products_subset_mean, x='CasM', y='Hodnota', color='Reprezentant')
-st.plotly_chart(fig_mean, use_container_width=True)
+st.subheader(f"📈 Časová řada pro {selected_reprezentant} ({selected_ukazatel})")
+
+# Graf
+fig = px.line(df_filtered, x='CasM', y='Hodnota', title=f"{selected_ukazatel} - {selected_reprezentant}",
+              markers=True, template="plotly_white")
+st.plotly_chart(fig, use_container_width=True)
+
+# Zobrazení tabulky
+st.subheader("Tabulka dat")
+st.dataframe(df_filtered)
