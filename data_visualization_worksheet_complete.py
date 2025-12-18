@@ -1,3 +1,9 @@
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+from pathlib import Path
+
 # Nastavení cesty k datům (CSV musí být ve stejné složce jako tento soubor)
 BASE_DIR = Path(__file__).parent
 DATA_PATH = BASE_DIR / "CEN0203F.csv"
